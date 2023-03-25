@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 16
-        cache: 'npm'
+        
     - name: Run dagger publish
       working-directory: /dagger/dagger-react
       run: node ./ci/publish.mjs
