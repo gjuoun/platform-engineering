@@ -19,18 +19,19 @@ jobs:
 
     - uses: pnpm/action-setup@v2
       name: Install pnpm
-      id: pnpm-install
       with:
         version: 7
-        run_install: true 
+        run_install: false
+
     - name: Use Node.js 16
       uses: actions/setup-node@v3
       with:
         node-version: 16
         cache: 'pnpm'
 
+    - name: Install dependencies
+      run: pnpm install
 
-        
     - name: Run dagger publish
       working-directory: ./dagger/dagger-react
       run: node ./ci/publish.mjs
