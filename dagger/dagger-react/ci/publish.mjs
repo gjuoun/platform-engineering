@@ -3,12 +3,17 @@ import { connect } from "@dagger.io/dagger"
 
 connect(async (client) => {
 
+  // create a cache volume
+  const nodeCache = client.cacheVolume("node")
+
   // use a node:16-slim container
   // mount the source code directory on the host
   // at /src in the container
+  // mount the cache volume to persist dependencies
   const source = client.container()
     .from("node:16-slim")
     .withMountedDirectory('/src', client.host().directory('.', { exclude: ["node_modules/", "ci/"] }))
+    .withMountedCache("/src/node_modules", nodeCache)
 
   // set the working directory in the container
   // install application dependencies
@@ -21,23 +26,20 @@ connect(async (client) => {
   const test = runner
     .withExec(["pnpm", "test", "--", "--watchAll=false"])
 
+  // first stage
   // build application
-  // write the build output to the host
-  await test
+  const buildDir = test
     .withExec(["pnpm", "run", "build"])
     .directory("./build")
-    .export("./build")
 
-  // highlight-start
+  // second stage
   // use an nginx:alpine container
-  // copy the build/ directory into the container filesystem
-  // at the nginx server root
+  // copy the build/ directory from the first stage
   // publish the resulting container to a registry
   const imageRef = await client.container()
     .from("nginx:1.23-alpine")
-    .withDirectory('/usr/share/nginx/html', client.host().directory('./build'))
+    .withDirectory('/usr/share/nginx/html', buildDir)
     .publish('ttl.sh/hello-dagger-' + Math.floor(Math.random() * 10000000))
   console.log(`Published image to: ${imageRef}`)
-  // highlight-end
 
 }, { LogOutput: process.stdout })
