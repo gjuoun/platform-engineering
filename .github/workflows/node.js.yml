@@ -21,6 +21,13 @@ jobs:
       with:
         node-version: 16
 
+    - uses: pnpm/action-setup@v2
+      name: Install pnpm
+      id: pnpm-install
+      with:
+        version: 7
+        run_install: true 
+        
     - name: Run dagger publish
       working-directory: ./dagger/dagger-react
       run: node ./ci/publish.mjs
