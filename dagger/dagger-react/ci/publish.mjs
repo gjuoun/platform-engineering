@@ -20,7 +20,8 @@ connect(async (client) => {
   const runner = source
     .withWorkdir("/src")
     .withExec(['npm','i','-g','pnpm'])
-    .withExec(["pnpm", "install"])
+    .withExec(["pnpm", "fetch"])
+    .withExec(["pnpm", "install", "-r", "--offline"])
 
   // run application tests
   const test = runner
