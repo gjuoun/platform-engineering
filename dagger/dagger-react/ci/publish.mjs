@@ -23,6 +23,7 @@ connect(async (client) => {
     .withExec(["pnpm", "fetch"])
     .withExec(["pnpm", "install", "-r", "--offline"])
 
+    
   // run application tests
   const test = runner
     .withExec(["pnpm", "test", "--", "--watchAll=false"])
